@@ -1,0 +1,29 @@
+Simple NodeJS & API gateway expose endpoints through that return list of uploaded videos on S3
+    const AWS = require('aws-sdk');
+    const s3 = new AWS.S3({ apiVersion: '2006-03-01' });
+
+    exports.handler = async (event, context) => {
+    try {
+    const bucketName = 'your-bucket-name';
+    const objects = await s3.listObjectsV2({ Bucket: bucketName }).promise();
+
+    const videos = await Promise.all(objects.Contents.map(async (obj) => {
+    const video = { key: obj.Key };
+    const videoUrl = await s3.getSignedUrl('getObject', { Bucket: bucketName, Key: obj.Key });
+    video.url = videoUrl;
+    // add other video details here
+    return video;
+    }));
+
+    return {
+    statusCode: 200,
+    body: JSON.stringify(videos),
+    };
+    } catch (err) {
+    console.error(err);
+    return {
+    statusCode: 500,
+    body: JSON.stringify({ message: 'Internal server error' }),
+    };
+    }
+    };
