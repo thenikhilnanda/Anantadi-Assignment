@@ -1,4 +1,6 @@
-const AWS = require('aws-sdk');
+Uploading a video file to S3 and print the contents of a JSON file using NodeJS.
+
+    const AWS = require('aws-sdk');
     const fs = require('fs');
 
     // Set up AWS credentials
